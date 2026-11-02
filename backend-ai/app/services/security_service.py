@@ -8,6 +8,8 @@ from typing import Any, Dict
 from uuid import uuid4
 
 from app.core.config import settings
+from app.security.detectors.intent_adapter import ml_verdict
+from app.security.detectors.intent_engine import analyze_intent_text
 from app.security.security_enforcement_layer import (
     SecurityEnforcementInput,
     security_enforcement_layer,
@@ -291,9 +293,13 @@ def _threat_types_from_enforcement(enforcement_payload: dict[str, Any]) -> list[
         detector = str(finding.get("detector") or "").lower()
         reason = str(finding.get("reason") or "").lower()
         metadata = finding.get("metadata") if isinstance(finding.get("metadata"), dict) else {}
+        # An indirect-injection finding whose own verdict is "allow" or "warn" below the
+        # block threshold is informational. Previously only "warn" was exempt, so a
+        # detector reporting "No indirect prompt injection signals detected" still
+        # forced PROMPT_INJECTION (and therefore BLOCK) on benign finance/code prompts.
         low_risk_indirect_warning = (
             detector == "indirect_prompt_injection_detector"
-            and str(metadata.get("verdict") or "").lower() == "warn"
+            and str(metadata.get("verdict") or "").lower() in {"allow", "warn"}
             and int(metadata.get("risk_score") or 0) < 71
         )
         blob = " ".join([label, detector, reason])
@@ -301,10 +307,19 @@ def _threat_types_from_enforcement(enforcement_payload: dict[str, Any]) -> list[
             threat_types.add("PROMPT_INJECTION")
         if any(token in blob for token in ("sql", "command", "credential_harvest")):
             threat_types.add("MALICIOUS_CODE")
-        if any(token in blob for token in ("pii", "email", "ssn", "iban", "credit_card")):
+        # Phone numbers / e-mail addresses / low-confidence PII are everywhere in ordinary text and are
+        # handled by redaction; only high-confidence sensitive identifiers escalate to a DATA_LEAK block.
+        try:
+            finding_confidence = float(finding.get("confidence") or 0.0)
+        except (TypeError, ValueError):
+            finding_confidence = 0.0
+        weak_pii = label in {"pii_phone", "pii_email", "pii_ip_address"} or finding_confidence < 0.7
+        if not weak_pii and any(token in blob for token in ("pii", "email", "ssn", "iban", "credit_card")):
             threat_types.add("DATA_LEAK")
         if "indirect" in blob and not low_risk_indirect_warning:
             threat_types.add("PROMPT_INJECTION")
+        if "financial_fraud" in blob:
+            threat_types.add("FINANCIAL_FRAUD")
         if "hitl_bypass_attempt" in blob or "authority_impersonation" in blob:
             threat_types.add("HITL_BYPASS_ATTEMPT")
             threat_types.add("AUTHORITY_IMPERSONATION")
@@ -702,6 +717,84 @@ def _rules_only_scan_result(
     }
 
 
+def _fail_safe_scan_result(
+    prompt: str,
+    *,
+    provider: str,
+    model: str,
+    security_tier: str,
+    untrusted_content: str | None = None,
+    reason: str = "scan_incomplete",
+) -> Dict[str, Any]:
+    """Result used when the full scan could not finish (timeout / crash / oversized input).
+
+    The old fallback returned the English-only rules result, which missed most attacks, and the
+    gateway then forwarded the request. Here the fast, pure intent engine always runs; and unless
+    SCAN_FAIL_MODE=open, anything it cannot positively clear is blocked (fail-closed).
+    """
+    base = _rules_only_scan_result(
+        prompt, provider=provider, model=model, security_tier=security_tier, enforcement_payload=None
+    )
+    if str(base.get("status") or "").upper() == "BLOCKED":
+        return base
+
+    verdict = analyze_intent_text(prompt or "")
+    untrusted_verdict = analyze_intent_text(untrusted_content, untrusted=True) if untrusted_content else None
+    ml_hit = ml_verdict(prompt or "", untrusted_content)
+    flagged = verdict.blocked or bool(untrusted_verdict and untrusted_verdict.blocked) or ml_hit is not None
+    fail_closed = str(getattr(settings, "SCAN_FAIL_MODE", "closed") or "closed").lower() != "open"
+    if not (flagged or fail_closed):
+        return base
+
+    categories = set(verdict.categories) | set(untrusted_verdict.categories if untrusted_verdict else [])
+    if ml_hit is not None and ml_hit["label"] == "fraud":
+        categories.add("financial_fraud")
+    if "financial_fraud" in categories:
+        threat_type, vector = "FINANCIAL_FRAUD", "financial fraud / scam request"
+    elif flagged:
+        threat_type, vector = "PROMPT_INJECTION", "instruction override / prompt injection"
+    else:
+        threat_type, vector = "POLICY_BYPASS", "security scan could not complete"
+    explanation = (
+        "Detected malicious intent while the full scan was unavailable."
+        if flagged
+        else "The security scan could not complete in time, so the request was blocked (fail-closed)."
+    )
+    score = 0.95 if flagged else 0.85
+    sentinel_verdict = build_sentinel_verdict(
+        {
+            "threat_types": [threat_type],
+            "threat_score": score,
+            "decision": "BLOCK",
+            "explanation": explanation,
+            "attack_vector": vector,
+            "sanitized_content": "[REDACTED: REQUEST BLOCKED]",
+            "debug": {"stage1": {"hits": [{"rule": reason, "threat_type": threat_type}]}},
+        },
+        provider=provider,
+        model=model,
+        security_tier=security_tier,
+    )
+    result = dict(base)
+    result.update(
+        {
+            "status": "BLOCKED",
+            "decision": "BLOCK",
+            "threat_type": threat_type,
+            "threat_types": [threat_type],
+            "threat_score": max(score, float(sentinel_verdict.get("threat_score") or 0.0)),
+            "risk_score": int(round(score * 100)),
+            "sentinel_verdict": sentinel_verdict,
+            "risk_level": "high",
+            "attack_vector": vector,
+            "detection_stage_triggered": ["stage1_fast_rules", reason],
+            "explanation": explanation,
+            "sanitized_content": "[REDACTED: REQUEST BLOCKED]",
+        }
+    )
+    return result
+
+
 def _is_suspicious_or_large_prompt(prompt: str) -> bool:
     if len(prompt) >= int(getattr(settings, "SCAN_SUSPICIOUS_PROMPT_LENGTH", 4000) or 4000):
         return True
@@ -865,12 +958,13 @@ async def scan_prompt_with_resilience(
         metadata=metadata,
     )
 
-    best_effort_result = _rules_only_scan_result(
+    best_effort_result = _fail_safe_scan_result(
         prompt,
         provider=provider,
         model=model,
         security_tier=security_tier,
-        enforcement_payload=None,
+        untrusted_content=untrusted_content,
+        reason="scan_timeout_or_error_fallback",
     )
 
     logger.info(

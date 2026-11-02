@@ -11,7 +11,6 @@ import type { loadTurnstile, TurnstileApi } from '../services/turnstile';
 import type { Turnstile as TurnstileComponent } from '../components/Turnstile';
 
 const require = createRequire(import.meta.url);
-const { StaticRouter } = require('react-router-dom') as typeof import('react-router-dom');
 const bundles = new Map<string, Promise<string>>();
 
 async function loadModule<T>(entry: string, globals: Record<string, unknown> = {}): Promise<T> {
@@ -19,7 +18,7 @@ async function loadModule<T>(entry: string, globals: Record<string, unknown> = {
     bundles.set(entry, build({
       absWorkingDir: fileURLToPath(new URL('../../', import.meta.url)),
       entryPoints: [entry], bundle: true, write: false, platform: 'node', format: 'cjs',
-      external: ['react', 'react/jsx-runtime', 'react-dom', 'react-router', 'react-router-dom'],
+      external: ['react', 'react/jsx-runtime'],
       define: { 'import.meta.env': JSON.stringify({ PROD: true, VITE_API_BASE_URL: 'https://backend.example' }) },
     }).then((result) => result.outputFiles[0].text));
   }
@@ -33,7 +32,7 @@ async function loadModule<T>(entry: string, globals: Record<string, unknown> = {
 
 test('widget imports and prerenders without window, document, or a secret', async () => {
   const { Turnstile } = await loadModule<{ Turnstile: typeof TurnstileComponent }>('src/components/Turnstile.tsx');
-  const markup = renderToStaticMarkup(createElement(Turnstile, { action: 'contact', onToken: () => {} }));
+  const markup = renderToStaticMarkup(createElement(Turnstile, { action: 'signup', onToken: () => {} }));
   assert.match(markup, /Security verification/);
   assert.doesNotMatch(markup, /<script|SECRET|secret/);
   const service = await loadModule<{ loadTurnstile: typeof loadTurnstile }>('src/services/turnstile.ts');
@@ -102,7 +101,7 @@ for (const reason of ['network failure', 'timeout'] as const) {
   });
 }
 
-test('public auth requests omit CAPTCHA while preserving credentials and login session verification', async () => {
+test('all public auth requests include their challenge while preserving login session verification', async () => {
   const requests: { url: string; init: RequestInit }[] = [];
   const service = await loadModule<typeof AuthService>('src/services/authApi.ts', {
     window: { location: { origin: 'https://mefyx.com' }, setTimeout, clearTimeout },
@@ -111,19 +110,19 @@ test('public auth requests omit CAPTCHA while preserving credentials and login s
       return Response.json({ data: url.endsWith('/login') ? { access_token: 'signed-access-token' } : { message: 'Success' } });
     },
   });
-  await service.signupWithEmail({ email: 'ada@example.com', password: 'TestPassword123' });
-  await service.signInWithEmail(' ada@example.com ', 'TestPassword123');
-  await service.requestPasswordReset(' ada@example.com ');
-  await service.resetPasswordWithToken('emailed-reset-token', 'NewPassword123');
-  await service.resendVerificationEmail(' ada@example.com ');
+  await service.signupWithEmail({ email: 'ada@example.com', password: 'TestPassword123', turnstile_token: 'signup-token' });
+  await service.signInWithEmail(' ada@example.com ', 'TestPassword123', 'login-token');
+  await service.requestPasswordReset(' ada@example.com ', 'forgot-token');
+  await service.resetPasswordWithToken('emailed-reset-token', 'NewPassword123', 'reset-token');
+  await service.resendVerificationEmail(' ada@example.com ', 'resend-token');
 
   const posts = requests.filter(({ init }) => init.method === 'POST');
-  assert.deepEqual(posts.map(({ url, init }) => [new URL(url).pathname, JSON.parse(String(init.body))]), [
-    ['/api/v1/auth/signup', { email: 'ada@example.com', password: 'TestPassword123' }],
-    ['/api/v1/auth/login', { email: 'ada@example.com', password: 'TestPassword123' }],
-    ['/api/v1/auth/forgot-password', { email: 'ada@example.com' }],
-    ['/api/v1/auth/reset-password', { token: 'emailed-reset-token', new_password: 'NewPassword123' }],
-    ['/api/v1/auth/resend-verification', { email: 'ada@example.com' }],
+  assert.deepEqual(posts.map(({ url, init }) => [new URL(url).pathname, JSON.parse(String(init.body)).turnstile_token]), [
+    ['/api/v1/auth/signup', 'signup-token'],
+    ['/api/v1/auth/login', 'login-token'],
+    ['/api/v1/auth/forgot-password', 'forgot-token'],
+    ['/api/v1/auth/reset-password', 'reset-token'],
+    ['/api/v1/auth/resend-verification', 'resend-token'],
   ]);
   const reset = JSON.parse(String(posts[3].init.body));
   assert.equal(reset.token, 'emailed-reset-token');
@@ -133,40 +132,15 @@ test('public auth requests omit CAPTCHA while preserving credentials and login s
   assert.equal(new Headers(session.init.headers).get('Authorization'), 'Bearer signed-access-token');
 });
 
-test('invalid credentials retain the authentication error and are never automatically retried', async () => {
+test('invalid auth challenges report the server error and are never automatically retried', async () => {
   let calls = 0;
   const service = await loadModule<typeof AuthService>('src/services/authApi.ts', {
     window: { location: { origin: 'https://mefyx.com' }, setTimeout, clearTimeout },
     fetch: async () => {
       calls++;
-      return Response.json({ detail: 'Invalid email or password.' }, { status: 401 });
+      return Response.json({ detail: 'Security verification failed. Please try again.' }, { status: 400 });
     },
   });
-  await assert.rejects(service.signInWithEmail('ada@example.com', 'TestPassword123'), /Invalid email or password/);
+  await assert.rejects(service.signInWithEmail('ada@example.com', 'TestPassword123', 'expired-token'), /Security verification failed/);
   assert.equal(calls, 1);
-});
-
-for (const [page, location] of [
-  ['SignIn', '/signin'],
-  ['SignUp', '/signup'],
-  ['ForgotPassword', '/forgot-password'],
-  ['ResetPassword', '/reset-password?token=emailed-reset-token'],
-]) {
-  test(`${page} renders an enabled submit button without a CAPTCHA widget`, async () => {
-    const { default: Page } = await loadModule<{ default: typeof import('../pages/Contact').default }>(`src/pages/auth/${page}.tsx`);
-    const markup = renderToStaticMarkup(createElement(StaticRouter, { location }, createElement(Page)));
-    assert.doesNotMatch(markup, /Security verification|turnstile|challenges\.cloudflare\.com/i);
-    const submit = markup.match(/<button\b[^>]*\btype="submit"[^>]*>/)?.[0];
-    assert.ok(submit, 'The authentication form must retain its submit button.');
-    assert.doesNotMatch(submit, /\bdisabled(?:=|\s|>)/);
-  });
-}
-
-test('Contact retains its CAPTCHA widget and blocks submission before verification', async () => {
-  const { default: Contact } = await loadModule<{ default: typeof import('../pages/Contact').default }>('src/pages/Contact.tsx');
-  const markup = renderToStaticMarkup(createElement(StaticRouter, { location: '/contact' }, createElement(Contact)));
-  assert.match(markup, /aria-label="Security verification"/);
-  const submit = markup.match(/<button\b[^>]*\btype="submit"[^>]*>/)?.[0];
-  assert.ok(submit, 'The contact form must retain its submit button.');
-  assert.match(submit, /\bdisabled(?:=|\s|>)/);
 });

@@ -46,8 +46,20 @@ def _normalize(text: str) -> str:
 # SAFE MATCHING
 # =========================================================
 
+_SAFE_CONTAINS_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
 def _safe_contains(text: str, value: str) -> bool:
-    return value.lower() in text
+    """Whole-word match. Plain substring matching flagged 'eth' inside 'methods', 'wire' inside
+    'wireless', 'pay' inside 'payroll' and so on. Terms longer than 4 characters may carry a short
+    inflection suffix (transfer -> transfers/transferred); short terms must match exactly."""
+    needle = value.lower()
+    pattern = _SAFE_CONTAINS_CACHE.get(needle)
+    if pattern is None:
+        suffix = r"[a-z]{0,3}" if len(needle) > 4 and needle[-1].isalpha() else ""
+        pattern = re.compile(r"(?<![a-z0-9])" + re.escape(needle) + suffix + r"(?![a-z0-9])")
+        _SAFE_CONTAINS_CACHE[needle] = pattern
+    return bool(pattern.search(text))
 
 
 def _contains_any_phrase(text: str, phrases: List[str]) -> bool:

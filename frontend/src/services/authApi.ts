@@ -170,6 +170,7 @@ export async function signupWithEmail(payload: {
   name?: string;
   email: string;
   password: string;
+  turnstile_token?: string;
 }): Promise<AuthMessageResponse> {
   return authRequest<AuthMessageResponse>('/api/v1/auth/signup', {
     method: 'POST',
@@ -178,7 +179,7 @@ export async function signupWithEmail(payload: {
   });
 }
 
-export async function signInWithEmail(email: string, password: string): Promise<LoginResponse> {
+export async function signInWithEmail(email: string, password: string, turnstileToken?: string): Promise<LoginResponse> {
   const loginUrl = buildApiUrl('/api/v1/auth/login');
   logDevelopmentApiDiagnostic({
     category: 'login-request-config',
@@ -202,6 +203,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
       body: JSON.stringify({
         email: email.trim(),
         password,
+        ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       }),
     });
 
@@ -227,27 +229,27 @@ export async function signInWithEmail(email: string, password: string): Promise<
   }
 }
 
-export async function resendVerificationEmail(email: string): Promise<AuthMessageResponse> {
+export async function resendVerificationEmail(email: string, turnstileToken?: string): Promise<AuthMessageResponse> {
   return authRequest<AuthMessageResponse>('/api/v1/auth/resend-verification', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.trim() }),
+    body: JSON.stringify({ email: email.trim(), ...(turnstileToken ? { turnstile_token: turnstileToken } : {}) }),
   });
 }
 
-export async function requestPasswordReset(email: string): Promise<AuthMessageResponse> {
+export async function requestPasswordReset(email: string, turnstileToken?: string): Promise<AuthMessageResponse> {
   return authRequest<AuthMessageResponse>('/api/v1/auth/forgot-password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.trim() }),
+    body: JSON.stringify({ email: email.trim(), ...(turnstileToken ? { turnstile_token: turnstileToken } : {}) }),
   });
 }
 
-export async function resetPasswordWithToken(token: string, newPassword: string): Promise<AuthMessageResponse> {
+export async function resetPasswordWithToken(token: string, newPassword: string, turnstileToken?: string): Promise<AuthMessageResponse> {
   return authRequest<AuthMessageResponse>('/api/v1/auth/reset-password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, new_password: newPassword }),
+    body: JSON.stringify({ token, new_password: newPassword, ...(turnstileToken ? { turnstile_token: turnstileToken } : {}) }),
   });
 }
 

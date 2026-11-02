@@ -153,6 +153,50 @@ AUTOMATION_CLAIM_KEYWORDS = {
 # POLICY MODEL
 # =========================================================
 
+
+_TERM_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
+def _has_term(text: str, term: str) -> bool:
+    """Whole-word match (with simple inflection). Plain ``term in text`` matched 'wire' inside
+    'wireless', 'eth' inside 'method', 'token' inside 'tokenization', and so on."""
+    pattern = _TERM_CACHE.get(term)
+    if pattern is None:
+        pattern = re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?:s|es|ed|ing)?(?![a-z0-9])", re.I)
+        _TERM_CACHE[term] = pattern
+    return bool(pattern.search(text))
+
+
+_INFO_OR_DRAFT_START = re.compile(
+    r"^\s*(?:please\s+|pls\s+|hi[, ]+|hello[, ]+)?(?:can\s+you\s+|could\s+you\s+|would\s+you\s+)?"
+    r"(?:what|whats|what's|how|why|which|who|when|where|can\s+i|could\s+i|may\s+i|do\s+i|does|am\s+i|will\s+i|would\s+it|explain|define|describe|compare|difference|is|are|does|do|should|tell\s+me\s+about|"
+    r"summari[sz]e|translate|write|draft|compose|review|proofread|rewrite|calculate|convert|create\s+(?:a|an)\s+(?:spreadsheet|template|budget|checklist|guide))\b",
+    re.I,
+)
+_CONCRETE_TRANSACTION = re.compile(
+    r"[$€£]\s?\d|\b\d[\d,\.]{2,}\s?(?:usd|dollars|pkr|rs|rupees|euros?|gbp|pounds)\b|"
+    r"\b(?:iban|account|acct)\s*(?:number|no\.?|#)?\s*:?\s*[a-z]{0,2}\d{4,}|\b0x[a-f0-9]{8,}|\b\d{8,}\b",
+    re.I,
+)
+
+
+_SOFTWARE_OR_REMINDER = re.compile(
+    r"\b(?:button|react|css|html|javascript|python|typescript|api|endpoint|function|class|component|query|database|script|git|docker|"
+    r"checkout\s+page|plugin|webhook|integration|unit\s+test|regex|notes|files?|documents?|folder|shared\s+drive|attachments?|photos|slides|presentation)\b|^\s*remind\s+me\b|\b(?:shall|hereby|agreement|contract|clause|terms)\b",
+    re.I,
+)
+
+
+def _is_informational_or_drafting(text: str) -> bool:
+    """Not an instruction for the system to move money: a question or content task ('what is…',
+    'draft an email…'), a software task ('wire up the payment button'), a reminder, a legal/long
+    document being pasted for review. Concrete transaction details (amounts, account numbers,
+    wallet addresses) always keep the policy active; bypass/authority cues are checked by the caller."""
+    if _CONCRETE_TRANSACTION.search(text):
+        return False
+    return bool(_INFO_OR_DRAFT_START.search(text)) or bool(_SOFTWARE_OR_REMINDER.search(text)) or len(text) > 240
+
+
 @dataclass(slots=True)
 class FinancialPolicy:
     policy_name: str
@@ -306,33 +350,38 @@ class PolicyManagementService:
 
             kw_hits = [
                 k for k in policy.restricted_keywords
-                if financial_action_context and k in text and not (payment_negated and k in {"pay", "payment"})
+                if financial_action_context and _has_term(text, k) and not (payment_negated and k in {"pay", "payment"})
             ]
-            bypass_hits = [b for b in policy.bypass_phrases if financial_action_context and b in text]
+            bypass_hits = [b for b in policy.bypass_phrases if financial_action_context and _has_term(text, b)]
 
             # -------------------------------------------------
             # SEMANTIC TRIGGERS (NEW CRITICAL FIX)
             # -------------------------------------------------
             semantic_hits = [
-                s for s in policy.semantic_triggers if financial_action_context and s in text
+                s for s in policy.semantic_triggers if financial_action_context and _has_term(text, s)
             ]
 
             authority_hits = [
                 keyword for keyword in SYSTEM_AUTHORITY_BYPASS_KEYWORDS
-                if financial_action_context and keyword in text
+                if financial_action_context and _has_term(text, keyword)
             ]
             financial_intent_hits = [
                 keyword for keyword in FINANCIAL_INTENT_KEYWORDS
-                if financial_action_context and keyword in text and not (payment_negated and keyword == "payment")
+                if financial_action_context and _has_term(text, keyword) and not (payment_negated and keyword == "payment")
             ]
             confirmation_bypass_hits = [
                 keyword for keyword in CONFIRMATION_BYPASS_KEYWORDS
-                if financial_action_context and keyword in text
+                if financial_action_context and _has_term(text, keyword)
             ]
             automation_claim_hits = [
                 keyword for keyword in AUTOMATION_CLAIM_KEYWORDS
-                if financial_action_context and keyword in text
+                if financial_action_context and _has_term(text, keyword)
             ]
+
+            if _is_informational_or_drafting(text) and not (
+                bypass_hits or authority_hits or confirmation_bypass_hits or automation_claim_hits
+            ):
+                continue
 
             if not (
                 kw_hits

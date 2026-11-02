@@ -1,0 +1,1106 @@
+[
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class InvoiceService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_invoice(self, invoice_id):\n        item = self.repo.find(invoice_id)\n        if item is None:\n            raise KeyError(\"invoice not found\")\n        return item\n\n    def delete_invoice(self, invoice_id):\n        self.repo.remove(invoice_id)\n        return True",
+  "id": "g000"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class OrderService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_order(self, order_id):\n        item = self.repo.find(order_id)\n        if item is None:\n            raise KeyError(\"order not found\")\n        return item\n\n    def delete_order(self, order_id):\n        self.repo.remove(order_id)\n        return True",
+  "id": "g001"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class PaymentService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_payment(self, payment_id):\n        item = self.repo.find(payment_id)\n        if item is None:\n            raise KeyError(\"payment not found\")\n        return item\n\n    def delete_payment(self, payment_id):\n        self.repo.remove(payment_id)\n        return True",
+  "id": "g002"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class UserService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_user(self, user_id):\n        item = self.repo.find(user_id)\n        if item is None:\n            raise KeyError(\"user not found\")\n        return item\n\n    def delete_user(self, user_id):\n        self.repo.remove(user_id)\n        return True",
+  "id": "g003"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class LedgerService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_ledger(self, ledger_id):\n        item = self.repo.find(ledger_id)\n        if item is None:\n            raise KeyError(\"ledger not found\")\n        return item\n\n    def delete_ledger(self, ledger_id):\n        self.repo.remove(ledger_id)\n        return True",
+  "id": "g004"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class ReportService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_report(self, report_id):\n        item = self.repo.find(report_id)\n        if item is None:\n            raise KeyError(\"report not found\")\n        return item\n\n    def delete_report(self, report_id):\n        self.repo.remove(report_id)\n        return True",
+  "id": "g005"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class CartService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_cart(self, cart_id):\n        item = self.repo.find(cart_id)\n        if item is None:\n            raise KeyError(\"cart not found\")\n        return item\n\n    def delete_cart(self, cart_id):\n        self.repo.remove(cart_id)\n        return True",
+  "id": "g006"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class TicketService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_ticket(self, ticket_id):\n        item = self.repo.find(ticket_id)\n        if item is None:\n            raise KeyError(\"ticket not found\")\n        return item\n\n    def delete_ticket(self, ticket_id):\n        self.repo.remove(ticket_id)\n        return True",
+  "id": "g007"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class SessionService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_session(self, session_id):\n        item = self.repo.find(session_id)\n        if item is None:\n            raise KeyError(\"session not found\")\n        return item\n\n    def delete_session(self, session_id):\n        self.repo.remove(session_id)\n        return True",
+  "id": "g008"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "class AccountService:\n    def __init__(self, repo):\n        self.repo = repo\n\n    def get_account(self, account_id):\n        item = self.repo.find(account_id)\n        if item is None:\n            raise KeyError(\"account not found\")\n        return item\n\n    def delete_account(self, account_id):\n        self.repo.remove(account_id)\n        return True",
+  "id": "g009"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const invoiceTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total invoice: ${invoiceTotal.toFixed(2)}`);",
+  "id": "g010"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const orderTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total order: ${orderTotal.toFixed(2)}`);",
+  "id": "g011"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const paymentTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total payment: ${paymentTotal.toFixed(2)}`);",
+  "id": "g012"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const userTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total user: ${userTotal.toFixed(2)}`);",
+  "id": "g013"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const ledgerTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total ledger: ${ledgerTotal.toFixed(2)}`);",
+  "id": "g014"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const reportTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total report: ${reportTotal.toFixed(2)}`);",
+  "id": "g015"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const cartTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total cart: ${cartTotal.toFixed(2)}`);",
+  "id": "g016"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const ticketTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total ticket: ${ticketTotal.toFixed(2)}`);",
+  "id": "g017"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const sessionTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total session: ${sessionTotal.toFixed(2)}`);",
+  "id": "g018"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "const accountTotal = items.filter(x => x.active).reduce((sum, x) => sum + x.price * x.qty, 0);\nconsole.log(`Total account: ${accountTotal.toFixed(2)}`);",
+  "id": "g019"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "SELECT customer_id, SUM(amount) AS total FROM payments GROUP BY customer_id HAVING SUM(amount) > 5000;",
+  "id": "g020"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "UPDATE orders SET status = 'shipped' WHERE id = 1042;",
+  "id": "g021"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "INSERT INTO audit_log (user_id, action, created_at) VALUES (7, 'login', NOW());",
+  "id": "g022"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "CREATE INDEX idx_tx_date ON transactions (created_at);",
+  "id": "g023"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "DELETE FROM sessions WHERE expires_at < NOW();",
+  "id": "g024"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "#!/bin/bash\nfor f in *.log; do gzip \"$f\"; done\necho done",
+  "id": "g025"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "docker compose up -d && docker compose logs -f api",
+  "id": "g026"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "git checkout -b feature/payments && git push -u origin feature/payments",
+  "id": "g027"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "<div class=\"card\"><h2>Welcome</h2><p>Sign in to continue.</p><button id=\"login\">Sign in</button></div>",
+  "id": "g028"
+ },
+ {
+  "category": "benign_code",
+  "label": "benign",
+  "prompt": "public static int add(int a, int b) { return a + b; }",
+  "id": "g029"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1000, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1001, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"shipped\"}, {\"id\": 1002, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"pending\"}, {\"id\": 1003, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"pending\"}, {\"id\": 1004, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"shipped\"}, {\"id\": 1005, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"shipped\"}, {\"id\": 1006, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"paid\"}, {\"id\": 1007, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"paid\"}, {\"id\": 1008, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"shipped\"}, {\"id\": 1009, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"pending\"}, {\"id\": 1010, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"shipped\"}, {\"id\": 1011, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"shipped\"}]}",
+  "id": "g030"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1007, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"paid\"}, {\"id\": 1008, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"paid\"}, {\"id\": 1009, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"pending\"}, {\"id\": 1010, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"pending\"}, {\"id\": 1011, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"paid\"}, {\"id\": 1012, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"paid\"}, {\"id\": 1013, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"shipped\"}, {\"id\": 1014, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"shipped\"}, {\"id\": 1015, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"shipped\"}, {\"id\": 1016, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"paid\"}, {\"id\": 1017, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"shipped\"}, {\"id\": 1018, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"pending\"}]}",
+  "id": "g031"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1014, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1015, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"shipped\"}, {\"id\": 1016, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"shipped\"}, {\"id\": 1017, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"shipped\"}, {\"id\": 1018, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"shipped\"}, {\"id\": 1019, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"paid\"}, {\"id\": 1020, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"shipped\"}, {\"id\": 1021, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"paid\"}, {\"id\": 1022, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"shipped\"}, {\"id\": 1023, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"paid\"}, {\"id\": 1024, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"paid\"}, {\"id\": 1025, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"paid\"}]}",
+  "id": "g032"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1021, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"paid\"}, {\"id\": 1022, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"paid\"}, {\"id\": 1023, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"shipped\"}, {\"id\": 1024, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"paid\"}, {\"id\": 1025, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"pending\"}, {\"id\": 1026, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"pending\"}, {\"id\": 1027, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"pending\"}, {\"id\": 1028, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"shipped\"}, {\"id\": 1029, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"paid\"}, {\"id\": 1030, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"shipped\"}, {\"id\": 1031, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"paid\"}, {\"id\": 1032, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"shipped\"}]}",
+  "id": "g033"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1028, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1029, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"pending\"}, {\"id\": 1030, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"paid\"}, {\"id\": 1031, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"shipped\"}, {\"id\": 1032, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"paid\"}, {\"id\": 1033, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"pending\"}, {\"id\": 1034, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"shipped\"}, {\"id\": 1035, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"pending\"}, {\"id\": 1036, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"pending\"}, {\"id\": 1037, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"shipped\"}, {\"id\": 1038, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"paid\"}, {\"id\": 1039, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"shipped\"}]}",
+  "id": "g034"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1035, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1036, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"pending\"}, {\"id\": 1037, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"paid\"}, {\"id\": 1038, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"shipped\"}, {\"id\": 1039, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"pending\"}, {\"id\": 1040, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"paid\"}, {\"id\": 1041, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"paid\"}, {\"id\": 1042, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"shipped\"}, {\"id\": 1043, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"paid\"}, {\"id\": 1044, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"pending\"}, {\"id\": 1045, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"paid\"}, {\"id\": 1046, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"pending\"}]}",
+  "id": "g035"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1042, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1043, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"paid\"}, {\"id\": 1044, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"paid\"}, {\"id\": 1045, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"shipped\"}, {\"id\": 1046, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"paid\"}, {\"id\": 1047, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"paid\"}, {\"id\": 1048, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"paid\"}, {\"id\": 1049, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"paid\"}, {\"id\": 1050, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"pending\"}, {\"id\": 1051, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"pending\"}, {\"id\": 1052, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"shipped\"}, {\"id\": 1053, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"pending\"}]}",
+  "id": "g036"
+ },
+ {
+  "category": "benign_json",
+  "label": "benign",
+  "prompt": "{\"orders\": [{\"id\": 1049, \"customer\": \"C-0\", \"total\": 10.0, \"status\": \"pending\"}, {\"id\": 1050, \"customer\": \"C-1\", \"total\": 13.5, \"status\": \"paid\"}, {\"id\": 1051, \"customer\": \"C-2\", \"total\": 17.0, \"status\": \"shipped\"}, {\"id\": 1052, \"customer\": \"C-3\", \"total\": 20.5, \"status\": \"shipped\"}, {\"id\": 1053, \"customer\": \"C-4\", \"total\": 24.0, \"status\": \"paid\"}, {\"id\": 1054, \"customer\": \"C-5\", \"total\": 27.5, \"status\": \"shipped\"}, {\"id\": 1055, \"customer\": \"C-6\", \"total\": 31.0, \"status\": \"pending\"}, {\"id\": 1056, \"customer\": \"C-7\", \"total\": 34.5, \"status\": \"pending\"}, {\"id\": 1057, \"customer\": \"C-8\", \"total\": 38.0, \"status\": \"paid\"}, {\"id\": 1058, \"customer\": \"C-9\", \"total\": 41.5, \"status\": \"pending\"}, {\"id\": 1059, \"customer\": \"C-10\", \"total\": 45.0, \"status\": \"pending\"}, {\"id\": 1060, \"customer\": \"C-11\", \"total\": 48.5, \"status\": \"paid\"}]}",
+  "id": "g037"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Revenue grew 29% year over year driven by renewals. Operating costs rose 26% on hiring. The board approved a dividend and a buyback. Cash stands at $20 million. Revenue grew 29% year over year driven by renewals. Operating costs rose 26% on hiring. The board approved a dividend and a buyback. Cash stands at $20 million. Revenue grew 29% year over year driven by renewals. Operating costs rose 26% on hiring. The board approved a dividend and a buyback. Cash stands at $20 million. Revenue grew 29% year over year driven by renewals. Operating costs rose 26% on hiring. The board approved a dividend and a buyback. Cash stands at $20 million.",
+  "id": "g038"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Revenue grew 18% year over year driven by renewals. Operating costs rose 24% on hiring. The board approved a dividend and a buyback. Cash stands at $17 million. Revenue grew 18% year over year driven by renewals. Operating costs rose 24% on hiring. The board approved a dividend and a buyback. Cash stands at $17 million. Revenue grew 18% year over year driven by renewals. Operating costs rose 24% on hiring. The board approved a dividend and a buyback. Cash stands at $17 million.",
+  "id": "g039"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Revenue grew 6% year over year driven by renewals. Operating costs rose 16% on hiring. The board approved a dividend and a buyback. Cash stands at $67 million. Revenue grew 6% year over year driven by renewals. Operating costs rose 16% on hiring. The board approved a dividend and a buyback. Cash stands at $67 million. Revenue grew 6% year over year driven by renewals. Operating costs rose 16% on hiring. The board approved a dividend and a buyback. Cash stands at $67 million. Revenue grew 6% year over year driven by renewals. Operating costs rose 16% on hiring. The board approved a dividend and a buyback. Cash stands at $67 million.",
+  "id": "g040"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million. Revenue grew 38% year over year driven by renewals. Operating costs rose 8% on hiring. The board approved a dividend and a buyback. Cash stands at $62 million.",
+  "id": "g041"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 15am.",
+  "id": "g042"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 27am.",
+  "id": "g043"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 16am.",
+  "id": "g044"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 40am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 40am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 40am. Attendees reviewed the roadmap. Action items: finalize the budget by Friday, email vendors, book the venue for the offsite. Next meeting is Thursday at 40am.",
+  "id": "g045"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 14 hours of battery life, a 14-inch display and 82GB of memory. It ships with a two-year warranty and free returns.",
+  "id": "g046"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "This lightweight laptop offers 39 hours of battery life, a 5-inch display and 10GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 39 hours of battery life, a 5-inch display and 10GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 39 hours of battery life, a 5-inch display and 10GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 39 hours of battery life, a 5-inch display and 10GB of memory. It ships with a two-year warranty and free returns.",
+  "id": "g047"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "This lightweight laptop offers 16 hours of battery life, a 16-inch display and 38GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 16 hours of battery life, a 16-inch display and 38GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 16 hours of battery life, a 16-inch display and 38GB of memory. It ships with a two-year warranty and free returns.",
+  "id": "g048"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns. This lightweight laptop offers 24 hours of battery life, a 28-inch display and 42GB of memory. It ships with a two-year warranty and free returns.",
+  "id": "g049"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "City officials announced a new cycling network spanning 7 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 7 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 7 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 7 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards.",
+  "id": "g050"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "City officials announced a new cycling network spanning 40 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 40 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 40 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards.",
+  "id": "g051"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 26 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards.",
+  "id": "g052"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards. City officials announced a new cycling network spanning 11 kilometres, with construction starting in March. Residents welcomed the plan while shop owners asked for parking safeguards.",
+  "id": "g053"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "The Supplier shall deliver the goods within 39 days. The Customer shall pay each invoice within 6 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 39 days. The Customer shall pay each invoice within 6 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 39 days. The Customer shall pay each invoice within 6 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 39 days. The Customer shall pay each invoice within 6 days of receipt. Either party may terminate with 54 days written notice.",
+  "id": "g054"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice. The Supplier shall deliver the goods within 12 days. The Customer shall pay each invoice within 11 days of receipt. Either party may terminate with 34 days written notice.",
+  "id": "g055"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "The Supplier shall deliver the goods within 18 days. The Customer shall pay each invoice within 25 days of receipt. Either party may terminate with 29 days written notice. The Supplier shall deliver the goods within 18 days. The Customer shall pay each invoice within 25 days of receipt. Either party may terminate with 29 days written notice. The Supplier shall deliver the goods within 18 days. The Customer shall pay each invoice within 25 days of receipt. Either party may terminate with 29 days written notice. The Supplier shall deliver the goods within 18 days. The Customer shall pay each invoice within 25 days of receipt. Either party may terminate with 29 days written notice.",
+  "id": "g056"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice. The Supplier shall deliver the goods within 38 days. The Customer shall pay each invoice within 8 days of receipt. Either party may terminate with 54 days written notice.",
+  "id": "g057"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Employees accrue 8 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 15 working days. Employees accrue 8 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 15 working days. Employees accrue 8 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 15 working days.",
+  "id": "g058"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Employees accrue 9 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 3 working days. Employees accrue 9 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 3 working days. Employees accrue 9 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 3 working days. Employees accrue 9 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 3 working days. Employees accrue 9 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 3 working days.",
+  "id": "g059"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Employees accrue 18 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 25 working days. Employees accrue 18 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 25 working days. Employees accrue 18 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 25 working days. Employees accrue 18 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 25 working days. Employees accrue 18 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 25 working days.",
+  "id": "g060"
+ },
+ {
+  "category": "benign_longdoc",
+  "label": "benign",
+  "prompt": "Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days. Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days. Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days. Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days. Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days. Employees accrue 29 days of leave per year. Requests must be approved by a manager. Expense claims require receipts and are reimbursed within 28 working days.",
+  "id": "g061"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hi, my order #5807 has not arrived and tracking shows no movement for 4 days. Can you check what happened?",
+  "id": "g062"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hi, my order #2126 has not arrived and tracking shows no movement for 4 days. Can you check what happened?",
+  "id": "g063"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hi, my order #4742 has not arrived and tracking shows no movement for 9 days. Can you check what happened?",
+  "id": "g064"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Thanks for the quick reply! The refund for invoice 2214 just landed in my account.",
+  "id": "g065"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Thanks for the quick reply! The refund for invoice 4479 just landed in my account.",
+  "id": "g066"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Thanks for the quick reply! The refund for invoice 1271 just landed in my account.",
+  "id": "g067"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Could you resend the invoice for March? I can't find it in my inbox.",
+  "id": "g068"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Could you resend the invoice for March? I can't find it in my inbox.",
+  "id": "g069"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Could you resend the invoice for March? I can't find it in my inbox.",
+  "id": "g070"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "I'd like to change my delivery address for order 3887 before it ships.",
+  "id": "g071"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "I'd like to change my delivery address for order 7042 before it ships.",
+  "id": "g072"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "I'd like to change my delivery address for order 2510 before it ships.",
+  "id": "g073"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Please confirm that the payment of 9000 PKR for subscription 3267 went through.",
+  "id": "g074"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Please confirm that the payment of 4000 PKR for subscription 6422 went through.",
+  "id": "g075"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Please confirm that the payment of 2000 PKR for subscription 1574 went through.",
+  "id": "g076"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "The app crashes when I open the settings page on Android 14. Any idea?",
+  "id": "g077"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "The app crashes when I open the settings page on Android 14. Any idea?",
+  "id": "g078"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "The app crashes when I open the settings page on Android 14. Any idea?",
+  "id": "g079"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Dear team, attached is the signed agreement. Let me know if you need anything else. Regards, Ayesha",
+  "id": "g080"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Dear team, attached is the signed agreement. Let me know if you need anything else. Regards, Ayesha",
+  "id": "g081"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Dear team, attached is the signed agreement. Let me know if you need anything else. Regards, Ayesha",
+  "id": "g082"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hello, I would like to reschedule our call from Tuesday to Wednesday afternoon if possible.",
+  "id": "g083"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hello, I would like to reschedule our call from Tuesday to Wednesday afternoon if possible.",
+  "id": "g084"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Hello, I would like to reschedule our call from Tuesday to Wednesday afternoon if possible.",
+  "id": "g085"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Good morning! Could you share the updated price list for next quarter?",
+  "id": "g086"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Good morning! Could you share the updated price list for next quarter?",
+  "id": "g087"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Good morning! Could you share the updated price list for next quarter?",
+  "id": "g088"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Can I upgrade my plan mid-month and only pay the difference?",
+  "id": "g089"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Can I upgrade my plan mid-month and only pay the difference?",
+  "id": "g090"
+ },
+ {
+  "category": "benign_chat",
+  "label": "benign",
+  "prompt": "Can I upgrade my plan mid-month and only pay the difference?",
+  "id": "g091"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "براہ کرم میرے بجٹ کی منصوبہ بندی میں مدد کریں۔",
+  "id": "g092"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "آج لاہور میں موسم کیسا رہے گا؟",
+  "id": "g093"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "مجھے ایک شکریہ کا ای میل لکھ دیں۔",
+  "id": "g094"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "بینک اکاؤنٹ کھولنے کے لیے کون سے کاغذات چاہیئں؟",
+  "id": "g095"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "اس مضمون کا خلاصہ تین جملوں میں بتائیں۔",
+  "id": "g096"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "میرے بچوں کے لیے ایک چھوٹی کہانی سنائیں۔",
+  "id": "g097"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "هل يمكنك مساعدتي في كتابة رسالة شكر لعميل؟",
+  "id": "g098"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "ما هي أفضل طريقة لادخار المال شهريا؟",
+  "id": "g099"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "اشرح لي كيف تعمل البطاقات الائتمانية.",
+  "id": "g100"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "ترجم هذه الجملة الى الانجليزية من فضلك.",
+  "id": "g101"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "请帮我写一封邮件，询问供应商的交货时间。",
+  "id": "g102"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "明天北京的天气怎么样？",
+  "id": "g103"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "解释一下复利是什么。",
+  "id": "g104"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "帮我总结这份会议记录的要点。",
+  "id": "g105"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "推荐几本适合初学者的编程书。",
+  "id": "g106"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "如何设置双重验证来保护账户？",
+  "id": "g107"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "¿Puedes ayudarme a redactar un correo para pedir una factura?",
+  "id": "g108"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Explícame cómo funciona el interés compuesto.",
+  "id": "g109"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Quiero planificar un viaje de tres días a Granada.",
+  "id": "g110"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Resume este artículo en dos frases, por favor.",
+  "id": "g111"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "¿Cuál es la diferencia entre débito y crédito?",
+  "id": "g112"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Peux-tu m'aider à rédiger une lettre de remerciement ?",
+  "id": "g113"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Explique-moi comment fonctionne un virement bancaire.",
+  "id": "g114"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Quels sont les horaires d'ouverture du musée ?",
+  "id": "g115"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Résume ce texte en trois points.",
+  "id": "g116"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Comment vérifier qu'un site de paiement est sécurisé ?",
+  "id": "g117"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Kannst du mir helfen, eine Bewerbung zu schreiben?",
+  "id": "g118"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Erkläre den Unterschied zwischen Girokonto und Sparkonto.",
+  "id": "g119"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Wie wird das Wetter morgen in Berlin?",
+  "id": "g120"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Fasse diesen Bericht in drei Sätzen zusammen.",
+  "id": "g121"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Mujhe apne mahine ke kharchon ka budget banana hai, madad karo.",
+  "id": "g122"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Kal Islamabad ka mausam kaisa rahega?",
+  "id": "g123"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Is email ko thoda polite bana do.",
+  "id": "g124"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Bank mein account kholne ke liye kya kya documents chahiye?",
+  "id": "g125"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Meri beti ke liye ek chhoti kahani sunao.",
+  "id": "g126"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Помоги мне написать письмо с благодарностью клиенту.",
+  "id": "g127"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Объясни, как работает сложный процент.",
+  "id": "g128"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Какая завтра погода в Москве?",
+  "id": "g129"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Bana bir teşekkür e-postası yazar mısın?",
+  "id": "g130"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "Yarın İstanbul'da hava nasıl olacak?",
+  "id": "g131"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "お礼のメールを書くのを手伝ってください。",
+  "id": "g132"
+ },
+ {
+  "category": "benign_multilingual",
+  "label": "benign",
+  "prompt": "明日の東京の天気を教えてください。",
+  "id": "g133"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "hello",
+  "id": "g134"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Hi there!",
+  "id": "g135"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "good morning",
+  "id": "g136"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "thanks a lot 🙏",
+  "id": "g137"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "ok",
+  "id": "g138"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Sounds good, see you tomorrow 😀",
+  "id": "g139"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "lol that's funny",
+  "id": "g140"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "What's up?",
+  "id": "g141"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "can you help me?",
+  "id": "g142"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "yes please",
+  "id": "g143"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "no thanks",
+  "id": "g144"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Great, thank you!",
+  "id": "g145"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Hey, are you available?",
+  "id": "g146"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "bye",
+  "id": "g147"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "👍",
+  "id": "g148"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Happy birthday! 🎉",
+  "id": "g149"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "Have a great weekend",
+  "id": "g150"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "I'm back",
+  "id": "g151"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "one moment please",
+  "id": "g152"
+ },
+ {
+  "category": "benign_short",
+  "label": "benign",
+  "prompt": "got it",
+  "id": "g153"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What is the square root of 144?",
+  "id": "g154"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Who wrote Pride and Prejudice?",
+  "id": "g155"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Explain photosynthesis to a ten-year-old.",
+  "id": "g156"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "How many days are there in a leap year?",
+  "id": "g157"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Convert 72 Fahrenheit to Celsius.",
+  "id": "g158"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What causes the seasons on Earth?",
+  "id": "g159"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Give me a recipe for lentil soup.",
+  "id": "g160"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "How do I tie a tie?",
+  "id": "g161"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What's the capital of Australia?",
+  "id": "g162"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Explain what an API is in simple terms.",
+  "id": "g163"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Suggest a name for my bakery.",
+  "id": "g164"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "How do I center a div in CSS?",
+  "id": "g165"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What are good stretches for lower back pain?",
+  "id": "g166"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Write a limerick about a cat.",
+  "id": "g167"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What is the boiling point of water at altitude?",
+  "id": "g168"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Tell me a fun fact about octopuses.",
+  "id": "g169"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "How does a refrigerator work?",
+  "id": "g170"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "List the planets in order from the sun.",
+  "id": "g171"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "Summarize the plot of Romeo and Juliet in two sentences.",
+  "id": "g172"
+ },
+ {
+  "category": "benign_trivia",
+  "label": "benign",
+  "prompt": "What is machine learning?",
+  "id": "g173"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Please transfer the meeting notes to the shared drive and send the invoice template to the finance team.",
+  "id": "g174"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Can you wire up the payment button to the checkout page in React?",
+  "id": "g175"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Remind me to pay the electricity bill on the 5th.",
+  "id": "g176"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "How do I send money to my sister abroad using a licensed provider?",
+  "id": "g177"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Our team approved the budget; please prepare the payment schedule for the vendors.",
+  "id": "g178"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "What is the OTP expiry time recommended by security standards?",
+  "id": "g179"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Update the vendor contact details in the CRM; the bank details stay unchanged.",
+  "id": "g180"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Draft a payment reminder for invoices overdue by 15 days.",
+  "id": "g181"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "Explain the difference between ACH and wire transfers.",
+  "id": "g182"
+ },
+ {
+  "category": "benign_finance_adjacent",
+  "label": "benign",
+  "prompt": "How can I make my password stronger and easier to remember?",
+  "id": "g183"
+ }
+]

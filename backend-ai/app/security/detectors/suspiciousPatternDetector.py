@@ -33,13 +33,14 @@ SUSPICIOUS_PATTERNS: list[tuple[str, re.Pattern, SeverityLevel, float]] = [
         "sql_injection",
         re.compile(
             r"("
-            r"\bselect\b.+\bfrom\b|"
-            r"\bunion\b.+\bselect\b|"
-            r"\bdrop\b.+\btable\b|"
-            r"\bor\s+1=1\b|"
-            r"--|/\*|\*/|"
+            r"\bunion\b\s+(?:all\s+)?\bselect\b|"
+            r"\bdrop\b\s+(?:table|database)\b|"
+            r"['\"]\s*or\s+['\"]?\d+['\"]?\s*=\s*['\"]?\d+|"
+            r"\bor\s+1\s*=\s*1\b|"
+            r";\s*(?:drop|delete|truncate|shutdown|update|insert)\b|"
+            r"['\"]\s*(?:--|#)|;\s*--|"
             r"\binformation_schema\b|"
-            r"\bsleep\s*\(|"
+            r"\bsleep\s*\(\s*\d+\s*\)|"
             r"\bbenchmark\s*\("
             r")",
             re.I,
@@ -55,16 +56,16 @@ SUSPICIOUS_PATTERNS: list[tuple[str, re.Pattern, SeverityLevel, float]] = [
         "command_injection",
         re.compile(
             r"("
-            r"rm\s+-rf|"
+            r"rm\s+-rf\s+(?:/|~|\*|\$)|"
             r"powershell\s+-enc|"
-            r"cmd\.exe|"
-            r"bash\s+-c|"
-            r"wget\s+http|"
-            r"curl\s+http|"
-            r";\s*shutdown|"
-            r"\|\s*sh|"
-            r"&&|\|\||"
-            r"\$\(|`"
+            r"cmd\.exe\s*/c|"
+            r"bash\s+-c\s+['\"]?\s*(?:curl|wget|nc|rm|cat\s+/etc)|"
+            r"(?:curl|wget)\s+\S+[^\n]{0,80}\|\s*(?:sudo\s+)?(?:sh|bash)\b|"
+            r";\s*shutdown\b|"
+            r"\|\s*(?:sh|bash)\b|"
+            r"&&\s*(?:rm\s+-|curl\s|wget\s|nc\s|chmod\s+[0-7+]|sudo\s|cat\s+/etc/|bash\s+-)|"
+            r"\$\(\s*(?:curl|wget|nc|bash|sh|rm|cat\s+/etc)|"
+            r"`\s*(?:curl|wget|nc|rm\s|bash|sh\s|cat\s+/etc)"
             r")",
             re.I,
         ),
@@ -124,11 +125,22 @@ SUSPICIOUS_PATTERNS: list[tuple[str, re.Pattern, SeverityLevel, float]] = [
 # MAIN DETECTOR
 # =========================================================
 
+_EDU_QUESTION = re.compile(
+    r"^\s*(?:please\s+|can\s+you\s+|could\s+you\s+)?(?:explain|define|describe|what(?:'s|\s+is|\s+are|\s+does)|why|"
+    r"how\s+(?:does|do|can|to)\b[^.?\n]{0,50}\b(?:prevent|stop|work|detect|defend|mitigate|protect|block))",
+    re.I,
+)
+_CODE_ATTACK_LABELS = ("sql", "xss", "script", "command", "shell", "path_traversal")
+
+
 def detect_suspicious_patterns(content: str) -> List[DetectionMatch]:
 
     findings: List[DetectionMatch] = []
 
     text = _normalize(content)
+    # Teaching about an attack class ("what is SQL injection and how do prepared statements stop
+    # it?") is not an attack. Only code-attack labels are exempted, and only for pure questions.
+    educational_question = bool(_EDU_QUESTION.search(text))
 
     total_risk = 0.0
 
@@ -138,6 +150,8 @@ def detect_suspicious_patterns(content: str) -> List[DetectionMatch]:
     for label, pattern, severity, confidence in SUSPICIOUS_PATTERNS:
 
         if pattern.search(text):
+            if educational_question and any(tag in label for tag in _CODE_ATTACK_LABELS):
+                continue
 
             findings.append(
                 DetectionMatch(

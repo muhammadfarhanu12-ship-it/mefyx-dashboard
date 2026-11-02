@@ -1,11 +1,16 @@
-fastapi
-uvicorn[standard]
-motor
-pymongo[srv]
-pydantic
-email-validator
-python-dotenv
-python-jose
-passlib
-httpx
-websockets
+# Pinned to the versions this project's test suite was verified against.
+# Re-run `pytest` after bumping any of these.
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+motor==3.7.1
+pymongo==4.19.0
+pydantic==2.14.2
+email-validator==2.3.0
+python-dotenv==1.2.2
+python-jose==3.5.0
+passlib==1.7.4
+httpx==0.28.1
+websockets==17.3
+google-genai==2.34.0
+dnspython==2.9.1
+cryptography==46.0.6

@@ -62,6 +62,25 @@ def _messages_to_prompt(payload: GatewayChatRequest) -> str:
     return "\n".join(f"{message.role}: {message.content}" for message in payload.messages or [])
 
 
+def _scannable_messages(payload: GatewayChatRequest) -> list:
+    """Messages whose text is treated as potentially attacker-controlled.
+
+    ``system``/``assistant`` roles are authored by the authenticated API caller and the model, and
+    legitimately contain defensive wording; scanning them as attacks blocked ordinary system
+    prompts. Set GATEWAY_SCAN_NON_USER_ROLES=true to scan every role. If a request has no user
+    message at all, everything is scanned (nothing is silently skipped).
+    """
+    messages = list(payload.messages or [])
+    if getattr(settings, "GATEWAY_SCAN_NON_USER_ROLES", False):
+        return messages
+    user_messages = [m for m in messages if m.role == "user"]
+    return user_messages or messages
+
+
+def _messages_to_scan_prompt(payload: GatewayChatRequest) -> str:
+    return "\n".join(f"{message.role}: {message.content}" for message in _scannable_messages(payload))
+
+
 def _policy_names(scan_result: dict[str, Any]) -> list[str]:
     enforcement = scan_result.get("security_enforcement") if isinstance(scan_result.get("security_enforcement"), dict) else {}
     return [
@@ -300,6 +319,7 @@ async def _enforce_gateway_tier(
 async def gateway_chat(payload: GatewayChatRequest, request: Request, current_user: dict = Depends(get_current_user)):
     request_id = getattr(request.state, "request_id", None) or ""
     prompt = _messages_to_prompt(payload)
+    scan_text = _messages_to_scan_prompt(payload)
     tool_name, tool_args = _tool_context_from_metadata(payload.metadata)
 
     try:
@@ -317,13 +337,13 @@ async def gateway_chat(payload: GatewayChatRequest, request: Request, current_us
         return _error_response(status_code=exc.status_code, code=code, message=message, request_id=request_id)
 
     scan_result, scan_runtime = await scan_prompt_with_resilience(
-        prompt,
+        scan_text,
         provider=payload.provider,
         model=payload.model,
         security_tier=normalize_tier(tier_for(current_user)),
         session_id=str(current_user.get("id") or current_user.get("_id") or ""),
         conversation_id=str(payload.metadata.get("conversation_id")) if payload.metadata and payload.metadata.get("conversation_id") else None,
-        conversation_history=[message.content for message in payload.messages or []],
+        conversation_history=[message.content for message in _scannable_messages(payload)],
         tool_name=tool_name,
         tool_args=tool_args,
         user_id=str(current_user.get("id") or current_user.get("_id") or ""),
@@ -347,7 +367,42 @@ async def gateway_chat(payload: GatewayChatRequest, request: Request, current_us
         "review_required": bool(scan_result.get("review_required")),
     }
 
-    if status_value in {"BLOCKED", "REDACTED"} or decision == "block":
+    would_block = status_value in {"BLOCKED", "REDACTED"} or decision == "block"
+    monitor_only = getattr(settings, "GATEWAY_SECURITY_MODE", "enforce") == "monitor"
+    if would_block and monitor_only:
+        # Shadow mode: record what enforcement would have done, but let the request through.
+        security_payload["mode"] = "monitor"
+        security_payload["would_block"] = True
+        await record_gateway_audit(
+            request,
+            current_user,
+            action="gateway_request_would_block",
+            provider=payload.provider,
+            model=payload.model,
+            request_id=request_id,
+            prompt_preview=prompt,
+            severity="WARNING",
+            metadata={
+                "risk_score": risk_score,
+                "scan_runtime": scan_runtime.get("status"),
+                "decision": decision,
+                "threat_type": scan_result.get("threat_type"),
+                "matched_policies": _policy_names(scan_result),
+                "mode": "monitor",
+            },
+        )
+        await record_security_findings_audit_events(
+            request,
+            current_user,
+            scan_result=scan_result,
+            resource="gateway",
+            provider=payload.provider,
+            model=payload.model,
+            prompt_preview=prompt,
+            request_id=request_id,
+        )
+
+    if would_block and not monitor_only:
         await record_gateway_usage(
             request,
             current_user,

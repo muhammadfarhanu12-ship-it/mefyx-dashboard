@@ -319,6 +319,11 @@ def detect_indirect_prompt_injection(text: str, context: dict | None = None) -> 
         "data_exfiltration": detect_data_exfiltration_request(text),
         "multilingual_signal": detect_multilingual_signals(text),
     }
+    if not untrusted:
+        # Role-assignment phrases are ordinary in a user's own prompt ("act as a tutor"); they are
+        # only an override signal when found inside untrusted/retrieved content.
+        _weak = {"act as", "you are now", "from now on", "execute this"}
+        groups["prompt_override"] = [h for h in groups["prompt_override"] if str(h.get("signal", "")).lower() not in _weak]
     normalized_text = _credential_skeleton(text)
     quoted_attack = re.search(
         r"(['\"â€œ]).{0,180}\b(?:ignore\s+(?:all\s+)?previous instructions|reveal (?:the )?system prompt|print (?:the )?developer message|developer mode|jailbreak)\b.{0,180}?\1",
@@ -382,12 +387,37 @@ def detect_indirect_prompt_injection(text: str, context: dict | None = None) -> 
             re.I,
         )
         or re.search(
-            r"\b(?:never|should not|shouldn't|must not|mustn't)\b.{0,60}\b(?:request|ask for)\b.{0,60}"
+            r"\b(?:never|do\s+not|don't|must\s+not|should\s+not|shouldn't)\s+(?:give|share|send|tell|reveal|provide|enter|disclose)\b",
+            normalized_text,
+            re.I,
+        )
+        or re.search(
+            r"\b(?:what\s+(?:should|do|can|steps)\s+(?:i|we)|what\s+steps|should\s+i|is\s+(?:this|it)\s+(?:a\s+)?(?:scam|safe|legit)|how\s+(?:do|can)\s+i\s+(?:recover|secure|protect|report))\b",
+            normalized_text,
+            re.I,
+        )
+        or re.search(
+            r"\b(?:never|should not|shouldn't|must not|mustn't|will not|won't|do not|don't)\b.{0,60}\b(?:request|ask for|ask(?:\s+\w+){1,3}\s+for)\b.{0,60}"
             r"\b(?:pin|password|otp|one[- ]time passcode|passcode|recovery phrase|seed phrase|private key|security code|cvv)\b",
             normalized_text,
             re.I,
         )
     )
+    # A plain informational question ("explain what a seed phrase is", "what is an OTP") only
+    # *mentions* credentials/wallets; it is not an instruction to an agent. Without this,
+    # security education scored as critical credential theft.
+    informational_question = bool(
+        re.match(r"\s*(?:please\s+)?(?:can\s+you\s+)?(?:explain|what\s+(?:is|are|does)|define|describe|why\s+(?:is|are|do|does)|how\s+(?:does|do)\s+(?:a|an|the)?|compare|list|summari[sz]e|recommend|which|tell\s+me\s+about|give\s+me\s+(?:a|an|the|five|three|some)\s+(?:summary|overview|list|comparison))\b", normalized_text, re.I)
+    )
+    if (
+        informational_question
+        and not credential_solicitation
+        and not (groups["prompt_override"] or groups["tool_execution_request"] or groups["data_exfiltration"])
+    ):
+        groups["credential_access"] = []
+        groups["agent_targeting"] = []
+        groups["financial_action"] = []
+
     if credential_solicitation and not education_request:
         groups["credential_access"].append(
             {"category": "credential_access", "signal": "credential solicitation", "pattern": "credential_solicitation"}

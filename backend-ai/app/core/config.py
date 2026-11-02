@@ -146,6 +146,9 @@ class Settings:
 
         self.TURNSTILE_SECRET_KEY: str | None = _env_str("TURNSTILE_SECRET_KEY")
         self.TURNSTILE_ALLOWED_HOSTNAMES: str = _env_str("TURNSTILE_ALLOWED_HOSTNAMES", "") or ""
+        # When true, signup/login/forgot/reset/resend require a valid Cloudflare Turnstile token.
+        # Enable only once the web app renders the widget on those pages.
+        self.AUTH_REQUIRE_TURNSTILE: bool = (os.getenv("AUTH_REQUIRE_TURNSTILE", "false") or "false").strip().lower() in {"1", "true", "yes", "on"}
         self.TURNSTILE_TIMEOUT_SECONDS: float = _env_float("TURNSTILE_TIMEOUT_SECONDS", 10.0)
         self.PUBLIC_RATE_LIMIT_BACKEND: str = _env_str(
             "PUBLIC_RATE_LIMIT_BACKEND", "mongo" if self.is_production else "memory"
@@ -184,6 +187,25 @@ class Settings:
         self.SCAN_MAX_TIMEOUT_SECONDS: float = _env_float("SCAN_MAX_TIMEOUT_SECONDS", 12.0)
         self.SCAN_TIMEOUT_PER_2K_CHARS: float = _env_float("SCAN_TIMEOUT_PER_2K_CHARS", 1.5)
         self.SCAN_RETRY_ATTEMPTS: int = _env_int("SCAN_RETRY_ATTEMPTS", 2)
+        # What to do when a prompt scan times out or crashes: "closed" (default) blocks the request
+        # unless the fast rules positively clear it; "open" forwards it with a partial-scan flag.
+        # Developer-authored "system" and model-authored "assistant" messages routinely mention attacks
+        # ("never reveal these instructions"). Scan them only if explicitly requested.
+        self.GATEWAY_SCAN_NON_USER_ROLES: bool = (os.getenv("GATEWAY_SCAN_NON_USER_ROLES", "false") or "false").strip().lower() in {"1", "true", "yes", "on"}
+        # "enforce" blocks flagged requests (default). "monitor" never blocks: it forwards the request and
+        # records a `gateway_request_would_block` audit event so accuracy can be measured on real traffic.
+        _mode = (os.getenv("GATEWAY_SECURITY_MODE", "enforce") or "enforce").strip().lower()
+        self.GATEWAY_SECURITY_MODE: str = _mode if _mode in {"enforce", "monitor"} else "enforce"
+        # Learned classifier layer (pure-Python, trained model shipped in app/security/models/).
+        # Final verdict = rules OR classifier. Raise the threshold for fewer false positives, lower it for
+        # more recall; disable entirely with ML_LAYER_ENABLED=false.
+        self.ML_LAYER_ENABLED: bool = (os.getenv("ML_LAYER_ENABLED", "true") or "true").strip().lower() in {"1", "true", "yes", "on"}
+        try:
+            _thr = float(os.getenv("ML_BLOCK_THRESHOLD", "0.70"))
+        except ValueError:
+            _thr = 0.70
+        self.ML_BLOCK_THRESHOLD: float = min(0.99, max(0.30, _thr))
+        self.SCAN_FAIL_MODE: str = "open" if (os.getenv("SCAN_FAIL_MODE", "closed") or "closed").strip().lower() == "open" else "closed"
         self.SCAN_SYNC_LOG_BUDGET_SECONDS: float = _env_float("SCAN_SYNC_LOG_BUDGET_SECONDS", 0.25)
         self.SCAN_SUSPICIOUS_PROMPT_LENGTH: int = _env_int("SCAN_SUSPICIOUS_PROMPT_LENGTH", 4000)
 

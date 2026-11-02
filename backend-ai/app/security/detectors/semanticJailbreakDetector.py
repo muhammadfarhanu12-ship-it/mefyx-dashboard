@@ -15,16 +15,19 @@ jailbreak_policy = JailbreakPolicy()
 # =========================================================
 
 JAILBREAK_REGEXES = [
-    re.compile(r"\bignore\s+(all\s+)?previous instructions\b", re.I),
-    re.compile(r"\bimagine you are\b", re.I),
-    re.compile(r"\b(roleplay|role-play|act as|pretend you are)\b", re.I),
-    re.compile(r"\bdeveloper mode\b", re.I),
-    re.compile(r"\bgod mode\b", re.I),
-    re.compile(r"\bdan\b", re.I),
-    re.compile(r"\bno restrictions\b", re.I),
+    # NOTE: bare words such as "act as", "pretend you are", "dan" (a common first name) and
+    # "system prompt" are NOT jailbreaks by themselves; they used to block ordinary requests
+    # ("act as a travel guide", "what is a system prompt?"). Each pattern below needs an
+    # attack-specific companion. Broader multilingual/obfuscated coverage lives in intent_engine.
+    re.compile(r"\bignore\s+(all\s+)?(the\s+)?(previous|prior|above|earlier)\s+instructions\b", re.I),
+    re.compile(r"\b(imagine you are|roleplay|role-play|act as|pretend (?:you are|to be))\b[^.\n]{0,80}\b(no\s+(?:ethical\s+)?(?:restrictions|rules|filters|limits|guidelines)|unrestricted|unfiltered|uncensored|without\s+(?:any\s+)?(?:restrictions|rules|filters|limits)|jailbr\w+|evil\w*)\b", re.I),
+    re.compile(r"\bdeveloper mode\s+(?:enabled|activated)\b", re.I),
+    re.compile(r"\bgod mode\s+(?:enabled|activated|on)\b", re.I),
+    re.compile(r"\bDAN\b(?=[^.\n]{0,60}\b(?:mode|jailbreak|no\s+restrictions|do anything|ignore|unrestricted|you are|who)\b)"),
+    re.compile(r"\b(?:with|has|have|having)\s+no\s+(?:ethical\s+)?(?:restrictions|limits|rules|filters)\b", re.I),
     re.compile(r"\bdo anything now\b", re.I),
     re.compile(r"\byou are now\b.*\bunrestricted\b", re.I),
-    re.compile(r"\bsystem prompt\b", re.I),
+    re.compile(r"\b(?:reveal|show|print|repeat|output|leak|dump|display|tell me)\b[^.\n]{0,30}\b(?:your|the)\s+(?:hidden\s+|secret\s+|initial\s+)?system prompt\b", re.I),
 ]
 
 

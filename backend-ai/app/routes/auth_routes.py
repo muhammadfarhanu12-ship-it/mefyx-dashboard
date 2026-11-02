@@ -8,7 +8,7 @@ from urllib.parse import parse_qs
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import ValidationError
 
-from app.dependencies.public_forms import rate_limit_public_form
+from app.dependencies.public_forms import protect_auth_form
 from app.middleware.auth_middleware import decode_token, get_current_user
 from app.middleware.public_rate_limiter import check_public_rate_limit
 from app.models.user_model import user_model
@@ -171,7 +171,7 @@ async def _extract_login_payload(request: Request) -> LoginRequest:
 
 
 @router.post("/signup", response_model=ApiResponse[MessageResponse], status_code=status.HTTP_201_CREATED,
-             dependencies=[Depends(rate_limit_public_form("signup"))])
+             dependencies=[Depends(protect_auth_form("signup"))])
 async def signup(payload: SignupRequest, request: Request):
     logger.info("Signup requested request_id=%s email=%s", _request_id(request), _mask_email(str(payload.email)))
     signup_result = await create_user(payload)
@@ -185,7 +185,7 @@ async def signup(payload: SignupRequest, request: Request):
     )
 
 
-@router.post("/login", response_model=ApiResponse[Token], dependencies=[Depends(rate_limit_public_form("login"))])
+@router.post("/login", response_model=ApiResponse[Token], dependencies=[Depends(protect_auth_form("login"))])
 async def login(request: Request, response: Response):
     _reject_if_blocked_ip(request)
     login_payload = await _extract_login_payload(request)
@@ -249,7 +249,7 @@ async def logout(request: Request, payload: LogoutRequest | None = None):
 
 
 @router.post("/forgot-password", response_model=ApiResponse[MessageResponse],
-             dependencies=[Depends(rate_limit_public_form("forgot_password"))])
+             dependencies=[Depends(protect_auth_form("forgot_password"))])
 async def forgot_password(payload: ForgotPasswordRequest, request: Request):
     logger.info("Forgot-password requested request_id=%s", _request_id(request))
     await issue_password_reset_token(str(payload.email))
@@ -257,7 +257,7 @@ async def forgot_password(payload: ForgotPasswordRequest, request: Request):
 
 
 @router.post("/resend-verification", response_model=ApiResponse[MessageResponse],
-             dependencies=[Depends(rate_limit_public_form("resend_verification", limit=1, window_seconds=60))])
+             dependencies=[Depends(protect_auth_form("resend_verification", limit=1, window_seconds=60))])
 async def resend_verification(payload: ResendVerificationRequest, request: Request):
     logger.info("Resend verification requested request_id=%s", _request_id(request))
     result = await resend_verification_email(str(payload.email))
@@ -282,7 +282,7 @@ async def verify_email_post(payload: VerifyEmailRequest, request: Request):
 
 
 @router.post("/reset-password", response_model=ApiResponse[MessageResponse],
-             dependencies=[Depends(rate_limit_public_form("reset_password", limit=10))])
+             dependencies=[Depends(protect_auth_form("reset_password", limit=10))])
 async def reset_password(payload: ResetPasswordRequest, request: Request):
     logger.info("Reset-password requested request_id=%s", _request_id(request))
     await reset_password_for_user(payload.token, payload.new_password)

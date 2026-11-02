@@ -83,6 +83,9 @@ class GatewaySecurity(BaseModel):
     status: str
     requires_2fa: bool = False
     review_required: bool = False
+    # Set only in GATEWAY_SECURITY_MODE=monitor, when enforcement would have blocked the request.
+    mode: str | None = None
+    would_block: bool = False
 
 
 class GatewayChatResponse(BaseModel):

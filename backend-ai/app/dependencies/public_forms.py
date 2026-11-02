@@ -5,6 +5,7 @@ from urllib.parse import parse_qs
 from fastapi import HTTPException, Request
 
 from app.middleware.public_rate_limiter import check_public_rate_limit
+from app.core.config import settings
 from app.services.turnstile_service import verify_turnstile
 
 
@@ -49,5 +50,17 @@ def protect_public_form(action: str, *, limit: int = 5, window_seconds: int = 90
     async def guard(request: Request) -> None:
         payload = await rate_limit(request)
         await verify_turnstile(payload.get("turnstile_token"), action=action)
+
+    return guard
+
+
+def protect_auth_form(action: str, *, limit: int = 5, window_seconds: int = 900):
+    """Rate limit auth endpoints and, when AUTH_REQUIRE_TURNSTILE is on, verify a Turnstile token."""
+    rate_limit = rate_limit_public_form(action, limit=limit, window_seconds=window_seconds)
+
+    async def guard(request: Request) -> None:
+        payload = await rate_limit(request)
+        if settings.AUTH_REQUIRE_TURNSTILE:
+            await verify_turnstile(payload.get("turnstile_token"), action=action)
 
     return guard

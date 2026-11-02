@@ -2,3 +2,14 @@
 pytest-cache-files-*/
 .pytest_cache/
 __pycache__/
+
+# secrets & local data (never commit)
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite*
+*.log
+__pycache__/
+.pytest_cache/
+venv/

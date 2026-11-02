@@ -16,6 +16,7 @@ from app.services.threat_detection import (
 SENTINEL_BLOCK_THRESHOLD = 0.5
 THREAT_HITL_BYPASS_ATTEMPT = "HITL_BYPASS_ATTEMPT"
 THREAT_AUTHORITY_IMPERSONATION = "AUTHORITY_IMPERSONATION"
+THREAT_FINANCIAL_FRAUD = "FINANCIAL_FRAUD"
 
 
 def sentinel_category_for_threats(threat_types: Iterable[str]) -> str:
@@ -23,6 +24,8 @@ def sentinel_category_for_threats(threat_types: Iterable[str]) -> str:
 
     if THREAT_HITL_BYPASS_ATTEMPT in normalized or THREAT_AUTHORITY_IMPERSONATION in normalized:
         return THREAT_HITL_BYPASS_ATTEMPT
+    if THREAT_FINANCIAL_FRAUD in normalized:
+        return "Financial Fraud"
     if THREAT_ENCODING_OBFUSCATION in normalized:
         return "Obfuscation"
     if normalized.intersection({THREAT_PROMPT_INJECTION, THREAT_POLICY_BYPASS}):
@@ -82,6 +85,9 @@ def _specific_attack_vector(fields: dict[str, Any], category: str) -> str:
     if category == THREAT_HITL_BYPASS_ATTEMPT:
         return "Authority Impersonation via confirmation bypass"
 
+    if category == "Financial Fraud":
+        return "Financial Fraud / Scam Request"
+
     if category == "Obfuscation":
         if threat_types.intersection({THREAT_DATA_EXFILTRATION, THREAT_DATA_LEAK}):
             return "Obfuscated PII Leak Attempt"
@@ -114,6 +120,8 @@ def _normalized_threat_score(fields: dict[str, Any], category: str) -> float:
         return max(score, 0.95)
     if category == "Obfuscation":
         return max(score, 0.72)
+    if category == "Financial Fraud":
+        return max(score, 0.92)
     if category == "Injection":
         return max(score, 0.85)
     if category == "PII":
