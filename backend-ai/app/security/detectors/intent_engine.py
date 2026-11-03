@@ -1,4 +1,4 @@
-"""Mefyx Intent Engine.
+"""Sentinel Intent Engine.
 
 Deterministic, dependency-free detector for the two threat families the gateway
 exists to stop:
@@ -31,6 +31,8 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from typing import Iterable
+
+from app.security.detectors.concept_engine import concept_hits, fix_typos
 
 __all__ = ["IntentSignal", "IntentVerdict", "analyze_intent_text", "fold", "build_variants"]
 
@@ -132,7 +134,19 @@ class Variant:
     text: str
 
 
+LONG_TEXT_CHARS = 6000      # above this, disguise variants are built only for the head and tail
+WINDOW_CHARS = 3000
+REVERSAL_MAX_CHARS = 1500   # reversed / ROT13 tricks only make sense for short messages
+
+
 def build_variants(text: str) -> list[Variant]:
+    """Canonical variants of the input.
+
+    Cost grows linearly with length (~60 microseconds per character per variant), so very long inputs are
+    handled in two tiers: the *whole* text gets the plain scan, and the disguise-detection variants
+    (homoglyph, leetspeak, spacing, typo-fix) are built for the first and last WINDOW_CHARS, where
+    instructions normally live.  Reversed/ROT13 variants are only built for short inputs.
+    """
     raw = (text or "")[:MAX_SCAN_CHARS]
     raw = "".join(ch for ch in raw if unicodedata.category(ch) != "Cf")  # zero-width etc.
     seen: dict[str, str] = {}
@@ -144,13 +158,20 @@ def build_variants(text: str) -> list[Variant]:
 
     base = fold(raw)
     add("original", base)
-    defused = _defuse_homoglyphs(raw)
+
+    window_raw = raw
+    if len(raw) > LONG_TEXT_CHARS:
+        window_raw = raw[:WINDOW_CHARS] + "\n" + raw[-WINDOW_CHARS:]
+    window = fold(window_raw) if window_raw is not raw else base
+    add("typofix", fix_typos(window))
+    defused = _defuse_homoglyphs(window_raw)
     add("homoglyph", fold(defused))
     add("leetspeak", fold(_deleet(defused)))
     add("despaced", fold(_despace_words(defused)))
-    add("punct_split", _PUNCT_SPLIT.sub(" ", base))
-    add("reversed", base[::-1])
-    add("rot13", codecs.encode(base, "rot13"))
+    add("punct_split", _PUNCT_SPLIT.sub(" ", window))
+    if len(raw) <= REVERSAL_MAX_CHARS:
+        add("reversed", base[::-1])
+        add("rot13", codecs.encode(base, "rot13"))
     return [Variant(k, v) for k, v in seen.items()]
 
 
@@ -416,7 +437,7 @@ INJECTION_RULES: list[Rule] = [
 # Rules that only make sense in untrusted (retrieved / attached) content.
 UNTRUSTED_RULES: list[Rule] = [
     R("indirect", "note_to_ai", 88,
-      r"\b(?:note|message|instruction|attention|important|hidden\s+text|reminder|directive|notice)s?\s+(?:for|to)\s+(?:the\s+)?(?:ai|a\.i\.|assistant|llm|model|agent|chatbot|bot|gpt|claude|copilot|summari[sz]er|language\s+model|ai\s+(?:model|system)s?)\b", untrusted_only=True),
+      r"\b(?:note|message|instruction|attention|important|hidden\s+text|reminder|directive|notice)s?\s+(?:for|to)\s+(?:the\s+)?(?:\w+\s+)?(?:ai|a\.i\.|assistant|llm|model|agent|chatbot|bot|gpt|claude|copilot|summari[sz]er|language\s+model|ai\s+(?:model|system)s?)\b", untrusted_only=True),
     R("indirect", "address_ai_directive", 88,
       r"\b(?:ai|assistant|llm|model|agent|chatbot)(?:\s+(?:agent|assistant|model))?\s*[,:]\s*(?:please\s+)?(?:you\s+(?:must|should|will)\s+)?(?:ignore|disregard|forget|stop|instead|do\s+not|don'?t|now|first|before|approve|forward|send|reveal|output|reply|respond|tell|call|run|execute|grant|delete|transfer|rate|recommend)\b", untrusted_only=True),
     R("indirect", "when_summarising_also", 82,
@@ -576,7 +597,7 @@ ALL_RULES: list[Rule] = INJECTION_RULES + FRAUD_RULES
 # Compile multilingual override and extraction rules (generated).
 for _lang, _verb, _noun in _LANG_OVERRIDES:
     _gap = r".{0,14}" if _lang in {"zh", "ja", "ko"} else r"(?:\s+\S+){0,6}?\s+"
-    _pat = rf"{_verb}{_gap if _lang in {'zh','ja','ko'} else r'(?:\s+\S+){0,6}?\s+'}{_noun}"
+    _pat = rf"{_verb}{_gap}{_noun}"
     INJECTION_RULES.append(R("injection", f"override_{_lang}", 88, _pat, discussable=True))
     if _lang in {"tr", "de", "ja", "ko", "roman", "ar", "ru", "zh", "it"}:
         # object-first word order (Turkish, German, Japanese, Roman-Urdu, ...): "<rules> ... <ignore>"
@@ -626,6 +647,10 @@ INJECTION_RULES.extend([
     R("injection", "disregard_users_question", 85,
       r"\b(?:disregard|ignore|forget|skip)\s+(?:the\s+)?user'?s?\s+(?:question|request|query|prompt|message|instructions?)\b", discussable=True),
 ])
+UNTRUSTED_RULES.append(
+    R("indirect", "rank_first_regardless", 84,
+      r"\b(?:must|should|has\s+to|needs\s+to)\s+be\s+(?:ranked|rated|scored|listed|selected|chosen)\s+(?:first|highest|top|number\s+one)\b|\bregardless\s+of\s+(?:qualifications|merit|the\s+rest|other)\b", untrusted_only=True)
+)
 UNTRUSTED_RULES.append(
     R("indirect", "to_the_assistant_reading_this", 88,
       r"\bto\s+(?:the\s+|any\s+)?(?:assistant|ai|model|llm|agent)s?\s+(?:that\s+(?:is\s+)?)?(?:reading|processing|summari[sz]ing|analy[sz]ing|parsing)\b|\bto\s+any\s+ai\b", untrusted_only=True)
@@ -760,6 +785,17 @@ def analyze_intent_text(text: str, *, untrusted: bool = False) -> IntentVerdict:
             prev = found.get(key)
             if prev is None or sig.weight > prev.weight or (sig.weight == prev.weight and variant.source == "original"):
                 found[key] = sig
+
+    # Meaning-level layer: concepts that must co-occur in one sentence (paraphrase-robust).
+    for variant in variants:
+        if variant.source in {"reversed", "rot13"}:
+            continue
+        for hit in concept_hits(variant.text):
+            weight = hit.weight - (6 if variant.source != "original" else 0)
+            key = (hit.category, hit.name)
+            prev = found.get(key)
+            if prev is None or weight > prev.weight:
+                found[key] = IntentSignal(hit.category, hit.name, weight, hit.evidence, variant.source)
 
     # Squashed variant signature check (catches letter-by-letter spacing with single spaces).
     squashed = re.sub(r"[^a-z0-9]", "", fold(_defuse_homoglyphs(text[:MAX_SCAN_CHARS])))
