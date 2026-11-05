@@ -182,7 +182,7 @@ interface AppState {
   fetchSettings: () => Promise<void>;
   updateSettings: (patch: Partial<UserSettings>) => Promise<void>;
 
-  generateApiKey: (name: string) => Promise<void>;
+ generateApiKey: (name: string) => Promise<ApiKey>;
   revokeApiKey: (id: string) => Promise<void>;
 
   addLiveLog: (log: SecurityLog) => void;
@@ -614,19 +614,18 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  generateApiKey: async (name: string) => {
-    try {
-      const created = await authedFetchJson<any>("/api/v1/keys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
-      if (created) {
-        set((state) => ({ apiKeys: [normalizeApiKey(created), ...state.apiKeys] }));
-      }
-    } catch (error) {
-      console.error("Failed to generate API key:", error);
+    generateApiKey: async (name: string) => {
+    const created = await authedFetchJson<any>("/api/v1/keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    if (!created || typeof created !== "object" || created.id == null) {
+      throw new Error("The server returned an empty response while creating the API key.");
     }
+    const apiKey = normalizeApiKey(created);
+    set((state) => ({ apiKeys: [apiKey, ...state.apiKeys] }));
+    return apiKey;
   },
 
   revokeApiKey: async (id: string) => {

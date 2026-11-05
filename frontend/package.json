@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "test": "node --import tsx --test src/tests/contact.test.ts src/tests/reports.test.ts src/tests/reportStatCard.test.tsx src/tests/remediationActions.test.tsx src/tests/playgroundGateway.test.ts src/tests/securityLogs.test.ts src/tests/securityLogStream.test.ts src/tests/signInDestination.test.ts src/tests/turnstile.test.tsx"
+    "test": "node --import tsx --test src/tests/contact.test.ts src/tests/reports.test.ts src/tests/reportStatCard.test.tsx src/tests/remediationActions.test.tsx src/tests/playgroundGateway.test.ts src/tests/securityLogs.test.ts src/tests/securityLogStream.test.ts src/tests/signInDestination.test.ts src/tests/turnstile.test.tsx src/tests/apiKeys.test.ts src/tests/apiKeysPage.test.tsx"
   },
   "dependencies": {
     "@google/genai": "^1.44.0",

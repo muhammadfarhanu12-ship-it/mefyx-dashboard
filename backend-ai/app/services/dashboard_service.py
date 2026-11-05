@@ -599,52 +599,18 @@ async def update_user_settings(request: Request, current_user: dict[str, Any], p
 
 
 async def ensure_primary_api_key(request: Request, current_user: dict[str, Any]) -> None:
-    user_id = user_id_for(current_user)
-    workspace_id = workspace_id_for(current_user)
-    collection = collection_from_request(request, "keys")
+    """Deprecated no-op.
 
-    async def build_primary_key_document() -> dict[str, Any]:
-        now = utcnow()
-        return {
-            "id": await next_numeric_id(request, namespace="keys", collection_name="keys", fallback_items=_fallback_store["keys"]),
-            "user_id": user_id,
-            "workspace_id": workspace_id,
-            "name": "Workspace Primary",
-            "status": "ACTIVE",
-            "usage_count": 0,
-            "created_at": now,
-            "updated_at": now,
-            "last_used": None,
-            "key_hash": hashlib.sha256(generate_api_key().encode("utf-8")).hexdigest(),
-        }
-
-    if collection is not None:
-        try:
-            existing = await collection.find_one({"user_id": user_id, "status": {"$nin": ["REVOKED", "revoked"]}})
-            if existing is not None:
-                return
-            document = await build_primary_key_document()
-            await collection.insert_one(document)
-            return
-        except Exception as exc:
-            logger.warning("Failed to ensure primary API key in MongoDB; using fallback store instead: %s", exc)
-
-    existing = next(
-        (
-            item
-            for item in _fallback_store["keys"]
-            if item.get("user_id") == user_id and not is_revoked_key_status(item.get("status"))
-        ),
-        None,
-    )
-    if existing is not None:
-        return
-    document = await build_primary_key_document()
-    _fallback_store["keys"].append(document)
+    This used to create a "Workspace Primary" key whose raw value was generated, hashed and thrown away,
+    so nobody could ever use or see it, yet it counted against the plan's key limit. Users now create
+    their own keys, whose secret is shown once at creation.
+    """
+    return None
 
 
 async def list_api_keys(request: Request, current_user: dict[str, Any]) -> list[dict[str, Any]]:
-    await ensure_primary_api_key(request, current_user)
+    # Read-only. Do NOT auto-create keys here: a key whose secret is never shown to anyone is unusable, it
+    # consumes the plan's key slot (FREE allows 1), and it used to be re-created after every revoke.
     user_id = user_id_for(current_user)
     collection = collection_from_request(request, "keys")
     if collection is not None:
@@ -705,8 +671,13 @@ async def create_api_key_record(request: Request, current_user: dict[str, Any], 
         try:
             await collection.insert_one(document)
         except Exception as exc:
-            logger.warning("Failed to store API key in MongoDB; using fallback store instead: %s", exc)
-            _fallback_store["keys"].append(document)
+            # Never hand out a key that was not persisted: it could not authenticate (lookups use the
+            # database) and an in-memory copy would vanish on restart.
+            logger.error("Failed to store API key in MongoDB error_type=%s", type(exc).__name__)
+            raise HTTPException(
+                status_code=503,
+                detail="API key storage is temporarily unavailable. Please try again in a moment.",
+            ) from exc
     else:
         _fallback_store["keys"].append(document)
 
