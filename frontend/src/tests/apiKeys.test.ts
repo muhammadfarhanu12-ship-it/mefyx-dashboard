@@ -93,3 +93,16 @@ test('copy reports failure instead of throwing when nothing works', async () => 
   });
   assert.equal(ok, false);
 });
+
+import { findReplaceableKey } from '../lib/apiKeys';
+
+test('findReplaceableKey returns the only active key', () => {
+  const keys = [{ id: '1', status: 'revoked' }, { id: '2', status: 'active' }, { id: '3', status: 'REVOKED' }];
+  assert.equal(findReplaceableKey(keys)?.id, '2');
+});
+
+test('findReplaceableKey does not guess when there are several active keys or none', () => {
+  assert.equal(findReplaceableKey([{ status: 'active' }, { status: 'active' }]), null);
+  assert.equal(findReplaceableKey([{ status: 'revoked' }]), null);
+  assert.equal(findReplaceableKey([]), null);
+});

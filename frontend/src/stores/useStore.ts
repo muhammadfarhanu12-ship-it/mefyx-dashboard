@@ -182,7 +182,8 @@ interface AppState {
   fetchSettings: () => Promise<void>;
   updateSettings: (patch: Partial<UserSettings>) => Promise<void>;
 
- generateApiKey: (name: string) => Promise<ApiKey>;
+  // Resolves with the new key (including its one-time secret). Rejects with the underlying error so the UI can show it.
+  generateApiKey: (name: string) => Promise<ApiKey>;
   revokeApiKey: (id: string) => Promise<void>;
 
   addLiveLog: (log: SecurityLog) => void;
@@ -614,7 +615,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-    generateApiKey: async (name: string) => {
+  generateApiKey: async (name: string) => {
     const created = await authedFetchJson<any>("/api/v1/keys", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -644,6 +645,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
     } catch (error) {
       console.error("Failed to revoke API key:", error);
+      throw error; // let the caller show a message instead of silently doing nothing
     }
   },
 

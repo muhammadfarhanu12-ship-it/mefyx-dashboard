@@ -113,3 +113,12 @@ export async function copyTextToClipboard(text: string, env: ClipboardEnv = defa
     }
   }
 }
+
+/**
+ * When the plan's key limit is reached, the key a user can replace in one step: the only non-revoked key.
+ * With several active keys we do not guess which one to revoke.
+ */
+export function findReplaceableKey<T extends { status?: string }>(keys: T[]): T | null {
+  const active = (keys || []).filter((k) => String(k?.status || '').toLowerCase() !== 'revoked');
+  return active.length === 1 ? active[0] : null;
+}

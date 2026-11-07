@@ -12,6 +12,7 @@ import {
   FULL_KEY_UNAVAILABLE_MESSAGE,
   copyTextToClipboard,
   describeApiKeyError,
+  findReplaceableKey,
   type ApiKeyErrorInfo,
 } from '../lib/apiKeys';
 
@@ -23,6 +24,7 @@ export default function ApiKeys() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [keyToRevoke, setKeyToRevoke] = useState<string | null>(null);
+  const [replaceAfterRevoke, setReplaceAfterRevoke] = useState(false);
   const [error, setError] = useState<ApiKeyErrorInfo | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [newKey, setNewKey] = useState<ApiKey | null>(null);
@@ -91,11 +93,33 @@ export default function ApiKeys() {
     void fetchApiKeys();
   };
 
+  const replaceableKey = findReplaceableKey(apiKeys);
+
+  const startReplace = () => {
+    if (!replaceableKey) return;
+    setReplaceAfterRevoke(true);
+    setKeyToRevoke(replaceableKey.id);
+  };
+
+  const closeRevokeDialog = () => {
+    setKeyToRevoke(null);
+    setReplaceAfterRevoke(false);
+  };
+
   const confirmRevoke = async () => {
-    if (keyToRevoke) {
+    if (!keyToRevoke) return;
+    const shouldReplace = replaceAfterRevoke;
+    try {
       await revokeApiKey(keyToRevoke);
-      setKeyToRevoke(null);
-      setError(null);
+    } catch {
+      closeRevokeDialog();
+      setError({ kind: 'unavailable', message: 'The key could not be revoked right now. Please try again in a moment.' });
+      return;
+    }
+    closeRevokeDialog();
+    setError(null);
+    if (shouldReplace) {
+      await handleGenerate();
     }
   };
 
@@ -131,6 +155,11 @@ export default function ApiKeys() {
           <div className="flex-1">
             <p className="font-medium text-red-300">Could not generate an API key</p>
             <p className="mt-1 text-red-200/90">{error.message}</p>
+            {error.kind === 'plan_limit' && replaceableKey && (
+              <Button variant="outline" size="sm" className="mt-3" onClick={startReplace}>
+                Replace &ldquo;{replaceableKey.name}&rdquo; with a new key
+              </Button>
+            )}
           </div>
           <button type="button" onClick={() => setError(null)} className="text-red-300 hover:text-red-100" aria-label="Dismiss error">
             ×
@@ -282,13 +311,19 @@ export default function ApiKeys() {
 
       <Modal
         isOpen={!!keyToRevoke}
-        onClose={() => setKeyToRevoke(null)}
-        title="Revoke API Key"
-        description="Are you sure you want to revoke this API key? Any applications using this key will immediately lose access to the Mefyx Gateway."
+        onClose={closeRevokeDialog}
+        title={replaceAfterRevoke ? 'Replace API key' : 'Revoke API Key'}
+        description={
+          replaceAfterRevoke
+            ? 'This revokes your current key immediately, so any application using it will lose access. A new key is then created and shown once so you can copy it.'
+            : 'Are you sure you want to revoke this API key? Any applications using this key will immediately lose access to the Mefyx Gateway.'
+        }
       >
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button variant="outline" onClick={() => setKeyToRevoke(null)}>Cancel</Button>
-          <Button variant="destructive" onClick={confirmRevoke}>Yes, Revoke Key</Button>
+          <Button variant="outline" onClick={closeRevokeDialog}>Cancel</Button>
+          <Button variant="destructive" onClick={confirmRevoke}>
+            {replaceAfterRevoke ? 'Revoke and create new key' : 'Yes, Revoke Key'}
+          </Button>
         </div>
       </Modal>
     </motion.div>
